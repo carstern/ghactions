@@ -1,0 +1,41 @@
+name: CI/CD Workflow
+
+# Körs när du pushar eller gör en pull request till main-branchen
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# Definiera jobb med en matrix-strategi för olika OS och Node-versioner
+jobs:
+  build-and-test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        node-version: [18, 20]
+    steps:
+      # Checka ut källkoden
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      # Ställ in Node.js-version baserat på matrix-parametern
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Installera dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Kör lint-steg
+      - name: Run linter
+        run: npm run lint
+
+      # Kör tester
+      - name: Run tests
+        run: npm test
